@@ -12,7 +12,7 @@ services:
     environment:
       - NGINX_HOST=localhost
     networks:
-      - laravel-development
+      - flarum-development
     depends_on:
       php-fpm:
         condition: service_started  # Wait for php-fpm to start
@@ -40,10 +40,10 @@ services:
       # Mount the application code for live updates
       - ./:/var/www
     networks:
-      - laravel-development
+      - flarum-development
     depends_on:
-      postgres:
-        condition: service_started  # Wait for postgres to start
+      mysql:
+        condition: service_started  # Wait for mysql to start
 
   workspace:
    # For the workspace service, we will also create a custom image to install and setup all the necessary stuff.
@@ -68,28 +68,26 @@ services:
     volumes:
       - ./:/var/www
     networks:
-      - laravel-development
+      - flarum-development
 
-  postgres:
-    image: postgres:16
+  mysql:
+    image: mysql
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${MYSQL_PORT:-3306}:3306"
     environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=laravel
-      - POSTGRES_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=flarum
+      - MYSQL_USER=flarum
+      - MYSQL_PASSWORD=secret
     volumes:
-      - postgres-data-development:/var/lib/postgresql/data
+      - ./mysql-data:/var/lib/mysql
     networks:
-      - laravel-development
+      - flarum-development
 
   redis:
     image: redis:alpine
     networks:
-      - laravel-development
+      - flarum-development
 
 networks:
-  laravel-development:
-
-volumes:
-  postgres-data-development:
+  flarum-development:
